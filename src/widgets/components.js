@@ -132,6 +132,7 @@ const components = {
   spoolman: dynamic(() => import("./spoolman/component")),
   stash: dynamic(() => import("./stash/component")),
   stocks: dynamic(() => import("./stocks/component")),
+  strava: dynamic(() => import("./strava/component")),
   strelaysrv: dynamic(() => import("./strelaysrv/component")),
   swagdashboard: dynamic(() => import("./swagdashboard/component")),
   suwayomi: dynamic(() => import("./suwayomi/component")),

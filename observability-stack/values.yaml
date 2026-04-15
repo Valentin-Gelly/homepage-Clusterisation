@@ -1,0 +1,16 @@
+namespace: observability
+
+tempo:
+  image: grafana/tempo:latest
+  servicePort: 3100
+
+otelCollector:
+  image: otel/opentelemetry-collector:latest
+
+grafana:
+  image: grafana/grafana:latest
+  adminPassword: admin
+
+victoria:
+  metricsUrl: http://victoria-metrics:8428
+  logsUrl: http://victoria-logs:9428

@@ -1185,5 +1185,11 @@
         "burned": "Burned",
         "remaining": "Remaining",
         "steps": "Steps"
+    },
+    "strava": {
+        "activity": "Last Activity",
+        "distance": "Distance",
+        "time": "Moving Time",
+        "elevation": "Elevation"
     }
 }

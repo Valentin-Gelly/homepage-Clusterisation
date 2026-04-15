@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-services
+  namespace: default
+  labels:
+    app.kubernetes.io/name: homepage
+data:
+  services.yaml: |
+    - Ça game ou quoi:
+        - Localisetesmorts:
+            href: http://localhost/
+            description: ici c'est solo
+        - SUPERWANMC:
+            icon: /icons/mc.png
+            description: Mineshaft
+            widget:
+              type: minecraft
+              url: udp://mc.hypixel.net:25565
+        - World at war:
+            icon: mdi-sword-cross
+            description: colonize
+            widget:
+              type: iframe
+              name: OpenFront
+              src: https://openfront.io
+    - Whl il est quel jour:
+        - Bah regarde:
+            icon: google-calendar
+            widget:
+              type: calendar
+              firstDayInWeek: monday
+              view: monthly
+              maxEvents: 10 # optional - defaults to 10
+              showTime: true # optional - show time for event happening today - defaults to false
+              previousDays: 3 # optional - shows events since three days ago - defaults to 0
+              timezone: Europe/Paris
+              integrations: # same as in Monthly view example
+                - type: ical
+                  url: https://calendar.google.com/calendar/ical/a.b.antoine04%40gmail.com/private-ee2baf5612fa306631438ed4d3d4112c/basic.ics
+                  name: Rdv
+                  color: zinc
+                  params:
+                    showName: true
+    - Sociel:
+        - MAMOT Mastodon:
+            widget:
+              type: mastodon
+              url: https://mamot.fr
+        - CHIEN:
+            widget:
+              type: customapi
+              url: https://dog.ceo/api/breeds/image/random
+              method: GET
+              display: grid
+              mappings:
+                - field: message
+                  label: Dog
+                  type: image
+        - Strava:
+            icon: strava.png
+            href: https://www.strava.com
+            description: Mes activités sportives
+            widget:
+              type: strava
+              url: https://www.strava.com/api/v3
+              client_id: "218169"
+              client_secret: "ffa857a769841c5cdf934ed1b5b065e9505d6363"
+              refresh_token: "0c3bcf13fc4493cd9dbaf7a393f21811578d28fd"
+              athlete_id: "182964604" 
