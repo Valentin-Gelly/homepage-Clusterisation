@@ -23,6 +23,6 @@ TEST SUITE: None
 
 puis faire un port forwarding pour accéder à grafana :
 ```bash
-kubectl port-forward -n observability svc/observability-grafana 3000:3000
+kubectl port-forward -n observability svc/grafana 3000:3000
 ```
     

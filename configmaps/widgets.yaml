@@ -7,10 +7,6 @@ metadata:
     app.kubernetes.io/name: homepage
 data:
    widgets.yaml: |
-    - greeting:
-        text_size: xl
-        text: Salut everybody tout le monde ! Ça y est, c'est mardi, c'est bientôt le weekend !
-
     - resources:
         cpu: true
         memory: true

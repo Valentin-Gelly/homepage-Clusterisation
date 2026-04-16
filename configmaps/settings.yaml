@@ -7,13 +7,19 @@ metadata:
     app.kubernetes.io/name: homepage
 data:
   settings.yaml: |
-    title: Bonjour, je
-    description: suis une homepage
-    background:
-      image: /images/DSCF1131.jpg
-      blur: sm # sm, "", md, xl... see https://tailwindcss.com/docs/backdrop-blur
-      opacity: 80 # 0-100
-    favicon: /images/eye_universe.png
+    title: Running Dashboard
+    theme: dark
+    color: slate
+    layout:
+      Training:
+        style: row
+        columns: 3
+      Infrastructure:
+        style: row
+        columns: 3
+      Services:
+        style: row
+        columns: 3
     providers:
       openweathermap: openweathermapapikey
       weatherapi: weatherapiapikey

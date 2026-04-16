@@ -38,6 +38,6 @@ spec:
   selector:
     app: grafana
   ports:
-    - name: http   # ✅ IMPORTANT
-      port: 3000
+    - name: http
+      port: 5000
       targetPort: 3000
