@@ -7,7 +7,7 @@ kubectl apply -f kubernetes/
 
 port forwarding pour accéder à l'application : 
 ```bash
-kubectl port-forward -n default svc/homepage 3000:3000
+kubectl port-forward -n default svc/homepage 5000:3000
 ```
 
 commande pour lancer grafana pour le premier lancement :
@@ -32,7 +32,7 @@ TEST SUITE: None
 
 puis faire un port forwarding pour accéder à grafana :
 ```bash
-kubectl port-forward -n observability svc/grafana 5000:5000
+kubectl port-forward -n observability svc/grafana 3000:3000
 ```
 
 Pour voir les pods et les services observability il faut spécifier le namespace `observability` :

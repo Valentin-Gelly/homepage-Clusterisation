@@ -85,6 +85,24 @@ spec:
               name: logs
             - mountPath: /app/public/images
               name: images
+        - name: log-shipper
+          image: fluent/fluent-bit:latest
+          args:
+            - /fluent-bit/bin/fluent-bit
+            - -i
+            - tail
+            - -p
+            - path=/var/log/pods/default_homepage-*/*/*.log
+            - -o
+            - http
+            - -p
+            - host=otel-collector.observability.svc.cluster.local
+            - -p
+            - port=4318
+            - -p
+            - uri=/v1/logs
+            - -p
+            - format=json
       volumes:
       - configMap:
           name: homepage-docker

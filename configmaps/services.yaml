@@ -67,4 +67,15 @@ data:
               client_id: "218169"
               client_secret: "ffa857a769841c5cdf934ed1b5b065e9505d6363"
               refresh_token: "0c3bcf13fc4493cd9dbaf7a393f21811578d28fd"
-              athlete_id: "182964604" 
+              athlete_id: "182964604"
+
+    - Observability:
+        - Grafana:
+            href: http://grafana.my.network
+            description: Dashboards & logs
+            icon: grafana.png
+            widget:
+              type: grafana
+              url: http://grafana.observability.svc.cluster.local:3000
+              username: admin
+              password: admin

@@ -11,8 +11,8 @@ data:
         url: http://victoria-metrics:8428
 
       - name: VictoriaLogs
-        type: loki
-        url: http://victoria-logs:9428
+        type: victoriametrics-logs-datasource
+        url: http://victoria-logs.observability.svc.cluster.local:9428
 
       - name: Tempo
         type: tempo

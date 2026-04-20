@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: otel-collector-config
+  namespace: observability
 data:
   config.yaml: |
     receivers:
@@ -17,8 +18,9 @@ data:
       prometheusremotewrite:
         endpoint: {{ .Values.victoria.metricsUrl }}/api/v1/write
 
-      loki:
-        endpoint: {{ .Values.victoria.logsUrl }}
+      otlphttp/vlog:
+        endpoint: {{ .Values.victoria.logsUrl }}/insert/jsononline
+        format: json
 
       otlp/tempo:
         endpoint: tempo:4317
@@ -35,17 +37,19 @@ data:
         logs:
           receivers: [otlp]
           processors: [batch]
-          exporters: [loki]
+          exporters: [http/vlog]
 
         traces:
           receivers: [otlp]
           processors: [batch]
           exporters: [otlp/tempo]
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: otel-collector
+  namespace: observability
 spec:
   replicas: 1
   selector:
@@ -59,24 +63,32 @@ spec:
       containers:
         - name: otel-collector
           image: {{ .Values.otelCollector.image }}
-          args: ["--config=/conf/config.yaml"]
+          args: ["--config=/etc/otel-collector/config.yaml"]
+          ports:
+            - containerPort: 4317
+            - containerPort: 4318
           volumeMounts:
             - name: config
-              mountPath: /conf
+              mountPath: /etc/otel-collector/config.yaml
+              subPath: config.yaml
       volumes:
         - name: config
           configMap:
             name: otel-collector-config
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: otel-collector
+  namespace: observability
 spec:
-  ports:
-    - port: 4317
-      name: grpc
-    - port: 4318
-      name: http
   selector:
     app: otel-collector
+  ports:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318

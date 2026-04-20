@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victoria-logs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: victoria-logs
+  template:
+    metadata:
+      labels:
+        app: victoria-logs
+    spec:
+      containers:
+        - name: victoria-logs
+          image: victoriametrics/victoria-logs:latest
+          args:
+            - -storageDataPath=/vlogs-data
+            - -httpListenAddr=:9428
+            - -opentelemetryListenAddr=:9417
+          ports:
+            - containerPort: 9428
+            - containerPort: 9417
+          volumeMounts:
+            - name: data
+              mountPath: /vlogs-data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: vlogs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: victoria-logs
+spec:
+  selector:
+    app: victoria-logs
+  ports:
+    - name: http
+      port: 9428
+      targetPort: 9428
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vlogs-pvc
+  namespace: observability
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
