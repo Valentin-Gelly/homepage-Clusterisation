@@ -87,6 +87,8 @@ spec:
               name: images
         - name: log-shipper
           image: fluent/fluent-bit:latest
+          securityContext:
+            runAsUser: 0
           args:
             - /fluent-bit/bin/fluent-bit
             - -i
@@ -94,15 +96,15 @@ spec:
             - -p
             - path=/var/log/pods/default_homepage-*/*/*.log
             - -o
-            - http
+            - opentelemetry
             - -p
             - host=otel-collector.observability.svc.cluster.local
             - -p
             - port=4318
-            - -p
-            - uri=/v1/logs
-            - -p
-            - format=json
+          volumeMounts:
+            - name: varlogpods
+              mountPath: /var/log/pods
+              readOnly: true
       volumes:
       - configMap:
           name: homepage-docker
@@ -133,3 +135,6 @@ spec:
       - persistentVolumeClaim:
           claimName: homepage-images-pvc
         name: images
+      - name: varlogpods
+        hostPath:
+          path: /var/log/pods

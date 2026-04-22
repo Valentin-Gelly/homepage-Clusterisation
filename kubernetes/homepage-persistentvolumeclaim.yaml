@@ -4,7 +4,7 @@ metadata:
   name: homepage-images-pvc
 spec:
   accessModes:
-    - ReadOnlyMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi

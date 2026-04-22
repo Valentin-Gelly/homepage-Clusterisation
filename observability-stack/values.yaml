@@ -10,9 +10,9 @@ otelCollector:
 victoria:
   metrics:
     image: victoriametrics/victoria-metrics:latest
-    url: http://127.0.0.1/:8428
+    url: http://victoria-metrics:8428
   logs:
     image: victoriametrics/victoria-logs:latest
-    url: http://127.0.0.1/:9428
+    url: http://victoria-logs:9428
   traces:
     image: victoriametrics/victoria-traces:latest

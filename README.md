@@ -32,7 +32,7 @@ TEST SUITE: None
 
 puis faire un port forwarding pour accéder à grafana :
 ```bash
-kubectl port-forward -n observability svc/grafana 80:80
+kubectl port-forward -n observability svc/grafana 4000:4000
 ```
 
 pour lancer victoria-logs : 
@@ -48,6 +48,11 @@ kubectl port-forward -n observability svc/victoria-metrics 8428:8428
 pour lancer traces : 
 ```bash
 kubectl port-forward -n observability svc/victoria-traces 8429:8429
+```
+
+pour lancer otel-collector : 
+```bash
+kubectl port-forward -n observability svc/otel-collector 4318:4318
 ```
 
 Pour voir les pods et les services observability il faut spécifier le namespace `observability` :
