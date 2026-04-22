@@ -23,6 +23,18 @@ spec:
               value: "victoriametrics-logs-datasource"
           ports:
             - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
           volumeMounts:
             - name: datasources
               mountPath: /etc/grafana/provisioning/datasources
@@ -39,36 +51,11 @@ metadata:
 spec:
   selector:
     app: grafana
+  # Remplacer par NodePort ou LoadBalancer pour un accès externe direct
+  # NodePort : ajouter `nodePort: 30300` dans ports pour un port fixe
+  type: ClusterIP
   ports:
     - name: http
-      port: 3000
+      port: 80
       targetPort: 3000
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: grafana
-  namespace: observability
-  annotations:
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/name: "Grafana"
-    gethomepage.dev/description: "Observability dashboards"
-    gethomepage.dev/group: "Observability"
-    gethomepage.dev/icon: "grafana.png"
-    gethomepage.dev/href: "http://localhost"
-    gethomepage.dev/widget.type: "grafana"
-    gethomepage.dev/widget.url: "http://grafana.observability.svc.cluster.local:3000"
-    gethomepage.dev/widget.username: "admin"
-    gethomepage.dev/widget.password: "admin"
-spec:
-  rules:
-    - host: "localhost"
-      http:
-        paths:
-          - path: "/"
-            pathType: Prefix
-            backend:
-              service:
-                name: grafana
-                port:
-                  number: 3000
+      protocol: TCP

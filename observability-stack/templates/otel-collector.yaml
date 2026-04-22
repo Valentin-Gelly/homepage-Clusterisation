@@ -10,40 +10,33 @@ data:
         protocols:
           grpc:
           http:
-
     processors:
       batch:
-
     exporters:
       prometheusremotewrite:
-        endpoint: {{ .Values.victoria.metricsUrl }}/api/v1/write
-
-      otlphttp/vlog:
-        endpoint: {{ .Values.victoria.logsUrl }}/insert/jsononline
-        format: json
-
-      otlp/tempo:
-        endpoint: tempo:4317
+        endpoint: {{ .Values.victoria.metrics.url }}/api/v1/write
+      otlp/vlogs:
+        endpoint: victoria-logs:4317
         tls:
           insecure: true
-
+      otlp/vtraces:
+        endpoint: victoria-traces:8429
+        tls:
+          insecure: true
     service:
       pipelines:
         metrics:
           receivers: [otlp]
           processors: [batch]
           exporters: [prometheusremotewrite]
-
         logs:
           receivers: [otlp]
           processors: [batch]
-          exporters: [http/vlog]
-
+          exporters: [otlp/vlogs]
         traces:
           receivers: [otlp]
           processors: [batch]
-          exporters: [otlp/tempo]
-
+          exporters: [otlp/vtraces]
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -63,19 +56,18 @@ spec:
       containers:
         - name: otel-collector
           image: {{ .Values.otelCollector.image }}
-          args: ["--config=/etc/otel-collector/config.yaml"]
+          args: ["--config=/etc/otel/config.yaml"]
           ports:
             - containerPort: 4317
             - containerPort: 4318
           volumeMounts:
             - name: config
-              mountPath: /etc/otel-collector/config.yaml
+              mountPath: /etc/otel/config.yaml
               subPath: config.yaml
       volumes:
         - name: config
           configMap:
             name: otel-collector-config
-
 ---
 apiVersion: v1
 kind: Service
@@ -86,9 +78,11 @@ spec:
   selector:
     app: otel-collector
   ports:
-    - name: otlp-grpc
-      port: 4317
-      targetPort: 4317
-    - name: otlp-http
-      port: 4318
-      targetPort: 4318
+    -   name: otlp-grpc
+        port: 4317
+        targetPort: 4317
+        protocol: TCP
+    -   name: otlp-http
+        port: 4318
+        targetPort: 4318
+        protocol: TCP
