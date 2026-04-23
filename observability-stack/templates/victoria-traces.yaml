@@ -18,7 +18,6 @@ spec:
           image: {{ .Values.victoria.traces.image | quote }}
           args:
             - -storageDataPath=/vtraces
-            - -otel.receiver.grpc.listenAddr=:4317
             - -httpListenAddr=:8429
           ports:
             - name: otlp-grpc

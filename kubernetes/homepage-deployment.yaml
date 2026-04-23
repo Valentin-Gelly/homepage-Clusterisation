@@ -101,6 +101,8 @@ spec:
             - host=otel-collector.observability.svc.cluster.local
             - -p
             - port=4318
+            - -p
+            - logs_uri=/v1/logs
           volumeMounts:
             - name: varlogpods
               mountPath: /var/log/pods
