@@ -11,46 +11,66 @@
  *  - Opérations sur les modules Node.js instrumentés automatiquement
  */
 
+// Stub function called by Next.js in build time - must export register
 export async function register() {
   // L'instrumentation ne doit s'exécuter que côté serveur Node.js,
   // pas dans le runtime Edge ni côté navigateur.
-  if (process.env.NEXT_RUNTIME !== "nodejs") {
+  if (typeof process === "undefined" || typeof process.env === "undefined") {
     return;
   }
 
-  const { NodeSDK } = await import("@opentelemetry/sdk-node");
-  const { getNodeAutoInstrumentations } = await import("@opentelemetry/auto-instrumentations-node");
-  const { OTLPTraceExporter } = await import("@opentelemetry/exporter-trace-otlp-http");
-  const { Resource } = await import("@opentelemetry/resources");
-  const { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } = await import("@opentelemetry/semantic-conventions");
+  if (process.env.NEXT_RUNTIME === "edge" || typeof window !== "undefined") {
+    return;
+  }
 
-  const sdk = new NodeSDK({
-    resource: new Resource({
-      // Nom du service visible dans Grafana / Tempo / VictoriaTraces
-      [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? "homepage",
-      // Version de l'application (injectée via NEXT_PUBLIC_VERSION à la build)
-      [ATTR_SERVICE_VERSION]: process.env.NEXT_PUBLIC_VERSION ?? "unknown",
-    }),
+  // Charger OpenTelemetry dynamiquement côté serveur uniquement
+  // Utiliser Function constructor pour contourner l'analyse statique de webpack
+  // qui autrement découvrirait les imports gRPC
+  const initCode = `
+    (async () => {
+      try {
+        const { NodeSDK } = require("@opentelemetry/sdk-node");
+        const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
+        const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-http");
+        const { Resource } = require("@opentelemetry/resources");
+        const { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } = require("@opentelemetry/semantic-conventions");
 
-    // Exporteur OTLP HTTP → OTel Collector
-    // L'URL de base est lue depuis OTEL_EXPORTER_OTLP_ENDPOINT,
-    // le SDK ajoute automatiquement /v1/traces.
-    traceExporter: new OTLPTraceExporter({
-      url: `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "http://otel-collector.observability.svc.cluster.local:4318"}/v1/traces`,
-    }),
+        const sdk = new NodeSDK({
+          resource: new Resource({
+            [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? "homepage",
+            [ATTR_SERVICE_VERSION]: process.env.NEXT_PUBLIC_VERSION ?? "unknown",
+          }),
 
-    instrumentations: [
-      getNodeAutoInstrumentations({
-        // Désactivé : génère trop de spans pour chaque lecture de fichier (config YAML, etc.)
-        "@opentelemetry/instrumentation-fs": { enabled: false },
-        // HTTP et HTTPS : trace les appels proxy vers Grafana, Strava, Minecraft, etc.
-        "@opentelemetry/instrumentation-http": { enabled: true },
-        // DNS : trace les résolutions DNS (utile pour débugger les problèmes réseau k8s)
-        "@opentelemetry/instrumentation-dns": { enabled: true },
-      }),
-    ],
-  });
+          traceExporter: new OTLPTraceExporter({
+            url: \`\${process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "http://otel-collector.observability.svc.cluster.local:4318"}/v1/traces\`,
+          }),
 
-  sdk.start();
+          instrumentations: [
+            getNodeAutoInstrumentations({
+              "@opentelemetry/instrumentation-fs": { enabled: false },
+              "@opentelemetry/instrumentation-http": { enabled: true },
+              "@opentelemetry/instrumentation-dns": { enabled: true },
+            }),
+          ],
+        });
+
+        sdk.start();
+        console.log("[instrumentation.js] OpenTelemetry SDK started successfully");
+      } catch (error) {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("[instrumentation.js] Failed to initialize OpenTelemetry:", error?.message);
+        }
+      }
+    })();
+  `;
+
+  // Exécuter le code côté serveur seulement
+  try {
+    // eslint-disable-next-line no-new-func
+    new Function(initCode)();
+  } catch (error) {
+    console.warn("[instrumentation.js] Failed to setup OpenTelemetry:", error?.message);
+  }
 }
+
 

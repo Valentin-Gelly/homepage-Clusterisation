@@ -14,6 +14,9 @@ importers:
       '@kubernetes/client-node':
         specifier: ^1.0.0
         version: 1.0.0
+      '@opentelemetry/api':
+        specifier: ^1.9.1
+        version: 1.9.1
       '@opentelemetry/auto-instrumentations-node':
         specifier: ^0.73.0
         version: 0.73.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.7.0(@opentelemetry/api@1.9.1))
@@ -23,12 +26,21 @@ importers:
       '@opentelemetry/resources':
         specifier: ^2.7.0
         version: 2.7.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-metrics':
+        specifier: ^2.7.0
+        version: 2.7.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-node':
         specifier: ^0.215.0
         version: 0.215.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace-node':
+        specifier: ^2.7.0
+        version: 2.7.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions':
         specifier: ^1.40.0
         version: 1.40.0
+      '@opentelemetry/winston-transport':
+        specifier: ^0.25.0
+        version: 0.25.0
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -1323,6 +1335,10 @@ packages:
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
+
+  '@opentelemetry/winston-transport@0.25.0':
+    resolution: {integrity: sha512-CMjRiHOdOgu9DaZq3ZmRjd1jd7WpIwEPlCOqrfTF6WOUriJ7Q0DieKqPnI+EkD5Y3+YgahrpiLIOIEeSp24AAw==}
+    engines: {node: ^18.19.0 || >=20.6.0}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -5758,6 +5774,11 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.7.0(@opentelemetry/api@1.9.1)
+
+  '@opentelemetry/winston-transport@0.25.0':
+    dependencies:
+      '@opentelemetry/api-logs': 0.215.0
+      winston-transport: 4.9.0
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
