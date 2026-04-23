@@ -1191,25 +1191,5 @@
         "distance": "Distance",
         "time": "Moving Time",
         "elevation": "Elevation"
-    },
-    "matomo": {
-      "nb_visits": "Visites",
-      "nb_uniq_visitors": "Visiteurs uniques",
-      "nb_users": "Utilisateurs",
-      "nb_actions": "Actions",
-      "nb_visits_converted": "Conversions",
-      "bounce_count": "Rebonds",
-      "bounce_rate": "Taux de rebond",
-      "nb_actions_per_visit": "Actions/visite",
-      "avg_time_on_site": "Temps moyen",
-      "sum_visit_length": "Durée totale",
-      "max_actions": "Max actions",
-      "nb_pageviews": "Pages vues",
-      "nb_uniq_pageviews": "Pages vues uniques",
-      "nb_downloads": "Téléchargements",
-      "nb_outlinks": "Liens sortants",
-      "live_visits": "Visites (live)",
-      "live_actions": "Actions (live)",
-      "live_visitors": "Visiteurs (live)"
     }
 }

@@ -1,6 +1,6 @@
 services:
   homepage:
-    image: homepage-clusterisation:latest
+    image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     ports:
       - 3000:3000

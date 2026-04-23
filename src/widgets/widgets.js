@@ -66,7 +66,6 @@ import lidarr from "./lidarr/widget";
 import linkwarden from "./linkwarden/widget";
 import lubelogger from "./lubelogger/widget";
 import mailcow from "./mailcow/widget";
-import matomo from "./matomo/widget";
 import mastodon from "./mastodon/widget";
 import mealie from "./mealie/widget";
 import medusa from "./medusa/widget";
@@ -225,7 +224,6 @@ const widgets = {
   linkwarden,
   lubelogger,
   mailcow,
-  matomo,
   mastodon,
   mealie,
   medusa,
