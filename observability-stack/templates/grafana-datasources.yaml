@@ -12,13 +12,26 @@ data:
         access: proxy
         url: http://victoria-metrics.observability.svc.cluster.local:8428
         isDefault: true
+        jsonData:
+          httpMethod: POST
+          timeInterval: "15s"
+
       - name: VictoriaLogs
         type: victoriametrics-logs-datasource
         access: proxy
         url: http://victoria-logs.observability.svc.cluster.local:9428
+
       - name: VictoriaTraces
         type: tempo
         access: proxy
-        url: http://victoria-traces.observability.svc.cluster.local:8429
+        url: http://victoria-traces.observability.svc.cluster.local:8429/select/tempo
         jsonData:
           httpMethod: GET
+          search:
+            hide: false
+          nodeGraph:
+            enabled: false
+          serviceMap:
+            datasourceUid: ''
+          lokiSearch:
+            datasourceUid: ''

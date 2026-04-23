@@ -7,7 +7,7 @@ kubectl apply -f kubernetes/
 
 port forwarding pour accéder à l'application : 
 ```bash
-kubectl port-forward -n default svc/homepage 5000:3000
+kubectl port-forward -n default svc/homepage 3000:3000
 ```
 
 commande pour lancer grafana pour le premier lancement :

@@ -19,11 +19,19 @@ spec:
           args:
             - -storageDataPath=/vtraces
             - -httpListenAddr=:8429
+            - -otlpGRPCListenAddr=:4317
+            - -otlpGRPC.tls=false
           ports:
             - name: otlp-grpc
               containerPort: 4317
             - name: http
               containerPort: 8429
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8429
+            initialDelaySeconds: 5
+            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service

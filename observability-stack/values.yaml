@@ -1,18 +1,18 @@
 namespace: observability
 
 grafana:
-  image: grafana/grafana:latest
+  image: grafana/grafana:11.4.0
   adminPassword: admin
 
 otelCollector:
-  image: otel/opentelemetry-collector:latest
+  image: otel/opentelemetry-collector-contrib:0.114.0
 
 victoria:
   metrics:
-    image: victoriametrics/victoria-metrics:latest
+    image: victoriametrics/victoria-metrics:v1.111.0
     url: http://victoria-metrics:8428
   logs:
-    image: victoriametrics/victoria-logs:v1.0.0-victorialogs
+    image: victoriametrics/victoria-logs:v1.23.0-victorialogs
     url: http://victoria-logs:9428
   traces:
     image: victoriametrics/victoria-traces:latest

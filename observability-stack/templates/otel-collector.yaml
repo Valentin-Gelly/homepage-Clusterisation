@@ -13,12 +13,36 @@ data:
           http:
             endpoint: 0.0.0.0:4318
 
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: victoria-metrics
+              scrape_interval: 15s
+              static_configs:
+                - targets: ['victoria-metrics:8428']
+            - job_name: victoria-logs
+              scrape_interval: 15s
+              static_configs:
+                - targets: ['victoria-logs:9428']
+            - job_name: victoria-traces
+              scrape_interval: 15s
+              static_configs:
+                - targets: ['victoria-traces:8429']
+            - job_name: otel-collector
+              scrape_interval: 15s
+              static_configs:
+                - targets: ['localhost:8888']
+
     processors:
       batch:
+        timeout: 5s
+        send_batch_size: 1000
 
     exporters:
       prometheusremotewrite:
         endpoint: "http://victoria-metrics:8428/api/v1/write"
+        tls:
+          insecure: true
 
       otlphttp/vlogs:
         endpoint: "http://victoria-logs:9428/insert/opentelemetry"  # ← corrigé
@@ -26,14 +50,17 @@ data:
           insecure: true
 
       otlphttp/vtraces:
-        endpoint: "http://victoria-traces:8429/opentelemetry"  # ← path HTTP
+        endpoint: "http://victoria-traces:8429/insert/opentelemetry"  # ← path HTTP
         tls:
           insecure: true
 
     service:
+      telemetry:
+        metrics:
+          address: 0.0.0.0:8888
       pipelines:
         metrics:
-          receivers: [otlp]
+          receivers: [otlp, prometheus]
           processors: [batch]
           exporters: [prometheusremotewrite]
         logs:
@@ -65,8 +92,12 @@ spec:
           image: {{ .Values.otelCollector.image }}
           args: ["--config=/etc/otel/config.yaml"]
           ports:
-            - containerPort: 4317
-            - containerPort: 4318
+            - name: otlp-grpc
+              containerPort: 4317
+            - name: otlp-http
+              containerPort: 4318
+            - name: metrics
+              containerPort: 8888
           volumeMounts:
             - name: config
               mountPath: /etc/otel/config.yaml
@@ -85,11 +116,15 @@ spec:
   selector:
     app: otel-collector
   ports:
-    -   name: otlp-grpc
-        port: 4317
-        targetPort: 4317
-        protocol: TCP
-    -   name: otlp-http
-        port: 4318
-        targetPort: 4318
-        protocol: TCP
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+    - name: metrics
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
