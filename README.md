@@ -9,6 +9,8 @@ Application [Homepage](https://gethomepage.dev/) déployée sur Kubernetes, avec
 Le projet contient le code source Next.js avec l'instrumentation OpenTelemetry. Il faut donc builder une image custom avant de déployer.
 
 ```bash
+cd homepage-local-project/
+
 # Build de l'image depuis le code source (inclut l'instrumentation OTel)
 docker build -t homepage:local .
 
