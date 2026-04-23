@@ -23,7 +23,7 @@ data:
         tls:
           insecure: true
       otlp/vtraces:
-        endpoint: victoria-traces:8429
+        endpoint: victoria-traces:4317
         tls:
           insecure: true
     service:

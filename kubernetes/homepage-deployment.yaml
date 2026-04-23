@@ -24,8 +24,18 @@ spec:
       enableServiceLinks: true
       containers:
         - name: homepage
-          image: "ghcr.io/gethomepage/homepage:latest"
-          imagePullPolicy: Always
+          # --- Déploiement local avec k3d (sans registry externe) ---
+          # 1. Build :  docker build -t homepage:local .
+          # 2. Import : k3d image import homepage:local -c homepage
+          # 3. Apply :  kubectl apply -f configmaps/ && kubectl apply -f kubernetes/
+          #
+          # --- Via le registry local k3d (avec Tilt ou push manuel) ---
+          # image: "k3d-registry.localhost:55000/homepage:local"
+          #
+          # --- Image officielle (sans instrumentation OTel custom) ---
+          # image: "ghcr.io/gethomepage/homepage:latest"
+          image: "homepage:local"
+          imagePullPolicy: Never
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -43,6 +53,14 @@ spec:
                   fieldPath: status.podIP
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: "localhost:5000,$(MY_POD_IP):4000,$(MY_POD_IP):3000" # See gethomepage.dev/installation/#homepage_allowed_hosts . Value before the comma is required for the k8s probe
+            # OpenTelemetry — traces envoyées à l'OTel Collector via OTLP HTTP
+            - name: OTEL_SERVICE_NAME
+              value: "homepage"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector.observability.svc.cluster.local:4318"
+            # Niveau de log OTel (optionnel) : none | error | warn | info | debug | verbose | all
+            - name: OTEL_LOG_LEVEL
+              value: "warn"
           ports:
             - name: http
               containerPort: 3000
