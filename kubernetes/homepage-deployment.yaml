@@ -24,8 +24,8 @@ spec:
       enableServiceLinks: true
       containers:
         - name: homepage
-          image: "ghcr.io/gethomepage/homepage:latest"
-          imagePullPolicy: Always
+          image: homepage-clusterisation:latest
+          imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -138,3 +138,4 @@ spec:
       - name: varlogpods
         hostPath:
           path: /var/log/pods
+
