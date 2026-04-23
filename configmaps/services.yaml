@@ -35,13 +35,6 @@ data:
               showTime: true # optional - show time for event happening today - defaults to false
               previousDays: 3 # optional - shows events since three days ago - defaults to 0
               timezone: Europe/Paris
-              integrations: # same as in Monthly view example
-                - type: ical
-                  url: https://calendar.google.com/calendar/ical/a.b.antoine04%40gmail.com/private-ee2baf5612fa306631438ed4d3d4112c/basic.ics
-                  name: Rdv
-                  color: zinc
-                  params:
-                    showName: true
     - Sociel:
         - MAMOT Mastodon:
             widget:
