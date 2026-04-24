@@ -12,7 +12,7 @@ victoria:
     image: victoriametrics/victoria-metrics:latest
     url: http://victoria-metrics:8428
   logs:
-    image: victoriametrics/victoria-logs:latest
+    image: victoriametrics/victoria-logs:v1.0.0-victorialogs
     url: http://victoria-logs:9428
   traces:
     image: victoriametrics/victoria-traces:latest

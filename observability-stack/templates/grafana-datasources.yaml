@@ -19,4 +19,6 @@ data:
       - name: VictoriaTraces
         type: tempo
         access: proxy
-        url: http://tempo.observability.svc.cluster.local:8429
+        url: http://victoria-traces.observability.svc.cluster.local:8429
+        jsonData:
+          httpMethod: GET
