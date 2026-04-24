@@ -15,6 +15,7 @@ cd homepage-local-project/
 docker build -t homepage:local .
 
 # Import direct dans le cluster k3d — aucun registry externe requis
+./k3d-up.sh
 k3d image import homepage:local -c homepage
 ```
 
@@ -117,7 +118,7 @@ kubectl delete --all deployments --namespace=observability
 k3d + Tilt permettent un workflow de développement itératif avec live update, sans registry externe :
 
 ```bash
-cd k3d
+cd homepage-local-project/k3d
 ./k3d-up.sh   # Crée le cluster k3d avec registry local intégré
 tilt up        # Build automatique + déploiement + hot-reload
 ```

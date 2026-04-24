@@ -6,25 +6,29 @@
 
 ## 📋 Ce qui a été fait
 
-### 1. Correction du port VictoriaTraces dans l'OTel Collector
+### 1. Configuration de l'export des traces vers VictoriaTraces
 
 **Fichier :** `observability-stack/templates/otel-collector.yaml`
 
-```yaml
-# Avant (incorrect)
-otlp/vtraces:
-  endpoint: victoria-traces:8429   # port HTTP admin — ne parle pas OTLP gRPC
+L'export vers VictoriaTraces utilise **OTLP HTTP** sur le port `8429` via l'endpoint `/opentelemetry` :
 
-# Après (corrigé)
-otlp/vtraces:
-  endpoint: victoria-traces:4317   # port OTLP gRPC — correct
+```yaml
+otlphttp/vtraces:
+  endpoint: "http://victoria-traces:8429/opentelemetry"
+  tls:
+    insecure: true
+```
+
+L'exporteur `otlphttp` du Collector appendra automatiquement `/v1/traces`, ce qui donne en résolution finale :
+```
+http://victoria-traces:8429/opentelemetry/v1/traces
 ```
 
 VictoriaTraces expose **deux ports distincts** :
-- `:4317` → récepteur OTLP gRPC (là où l'OTel Collector doit envoyer les traces)
-- `:8429` → interface HTTP d'administration et de requêtage
+- `:4317` → récepteur OTLP **gRPC** (alternatif, non utilisé ici)
+- `:8429` → interface HTTP (admin, requêtage, **et** OTLP HTTP via `/opentelemetry/v1/traces`)
 
-Sans cette correction, les traces auraient été rejetées par VictoriaTraces avec une erreur de protocole.
+Le choix d'OTLP HTTP plutôt que gRPC pour cette liaison interne est intentionnel : plus simple à débugger, pas de configuration de transport supplémentaire, et suffisant pour des volumes de traces locaux.
 
 ---
 
@@ -110,9 +114,9 @@ Next.js 15+ fournit un hook officiel chargé **une seule fois** avant le démarr
 
 Instrumenter manuellement chaque appel `fetch` ou `httpProxy` aurait représenté des dizaines de modifications dans le code métier, couplant la télémétrie à la logique applicative. L'auto-instrumentation patche les modules Node.js natifs (`http`, `https`) au démarrage : **zéro modification du code existant**, couverture complète des appels réseau.
 
-### OTLP HTTP plutôt que gRPC pour l'export de traces
+### OTLP HTTP pour toute la chaîne d'export
 
-L'OTel Collector écoute sur le port `4318` (HTTP) depuis le pod Homepage. HTTP est plus simple à débugger (`curl`able), traverse mieux les proxies, et ne nécessite pas de configuration TLS supplémentaire en environnement interne. La communication entre l'OTel Collector et VictoriaTraces utilise gRPC (port `4317`) car c'est une communication interne cluster-to-cluster où gRPC est plus efficace.
+L'OTel Collector utilise OTLP HTTP pour envoyer vers **VictoriaLogs** (`/insert/opentelemetry`) et **VictoriaTraces** (`/opentelemetry`), et Prometheus Remote Write pour **VictoriaMetrics**. Cette cohérence HTTP simplifie le débogage (tout est `curl`able) et évite de gérer plusieurs protocoles de transport.
 
 ### `imagePullPolicy: Never` + `k3d image import`
 
@@ -125,15 +129,19 @@ L'OTel Collector écoute sur le port `4318` (HTTP) depuis le pod Homepage. HTTP 
 ### Étape 1 — Build et déploiement
 
 ```bash
-# Builder l'image
+# Builder l'image depuis le code source (le Dockerfile est dans homepage-local-project/)
+cd homepage-local-project/
 docker build -t homepage:local .
+cd ..
 
-# Importer dans k3d
+# Importer dans k3d — aucun registry externe requis
 k3d image import homepage:local -c homepage
 
-# Déployer
+# Déployer l'application et la configuration
 kubectl apply -f configmaps/
 kubectl apply -f kubernetes/
+
+# Déployer la stack d'observabilité
 helm upgrade --install observability ./observability-stack \
   --namespace observability --create-namespace
 ```
