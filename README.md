@@ -32,7 +32,7 @@ kubectl apply -f kubernetes/
 
 Port forwarding pour accéder à l'application :
 ```bash
-kubectl port-forward -n default svc/homepage 5000:3000
+kubectl port-forward -n default svc/homepage 3000:3000
 ```
 
 ---
