@@ -12,10 +12,53 @@ data:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
+      filelog:
+        include:
+          - /var/log/pods/*/*/*.log
+        include_file_path: true
+        include_file_name: false
+        operators:
+          - type: regex_parser
+            parse_from: attributes["log.file.path"]
+            regex: '^/var/log/pods/(?P<namespace>[^_]+)_(?P<pod>[^_]+)_(?P<uid>[^/]+)/(?P<container>[^/]+)/.*\.log$'
+          - type: container
+          - type: move
+            from: attributes.namespace
+            to: resource["k8s.namespace.name"]
+          - type: move
+            from: attributes.pod
+            to: resource["k8s.pod.name"]
+          - type: move
+            from: attributes.container
+            to: resource["k8s.container.name"]
 
       prometheus:
         config:
           scrape_configs:
+            - job_name: kubernetes-pods
+              kubernetes_sd_configs:
+                - role: pod
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                  action: keep
+                  regex: "true"
+                - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+                  action: replace
+                  target_label: __metrics_path__
+                  regex: (.+)
+                - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+                  action: replace
+                  target_label: __address__
+                  regex: ([^:]+)(?::\d+)?;(\d+)
+                  replacement: $1:$2
+                - action: labelmap
+                  regex: __meta_kubernetes_pod_label_(.+)
+                - source_labels: [__meta_kubernetes_namespace]
+                  action: replace
+                  target_label: kubernetes_namespace
+                - source_labels: [__meta_kubernetes_pod_name]
+                  action: replace
+                  target_label: kubernetes_pod_name
             - job_name: victoria-metrics
               scrape_interval: 15s
               static_configs:
@@ -32,8 +75,41 @@ data:
               scrape_interval: 15s
               static_configs:
                 - targets: ['localhost:8888']
+            - job_name: kube-state-metrics
+              scrape_interval: 15s
+              static_configs:
+                - targets: ['kube-state-metrics.observability.svc.cluster.local:8080']
+      hostmetrics:
+        collection_interval: 30s
+        scrapers:
+          cpu: {}
+          filesystem: {}
+          load: {}
+          memory: {}
+          network: {}
+      kubeletstats:
+        auth_type: serviceAccount
+        collection_interval: 20s
+        endpoint: https://${env:NODE_NAME}:10250
+        insecure_skip_verify: true
+        metric_groups:
+          - node
+          - pod
+          - container
 
     processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 512
+        spike_limit_mib: 128
+      k8sattributes:
+        auth_type: serviceAccount
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.pod.name
+            - k8s.container.name
+            - k8s.node.name
       batch:
         timeout: 5s
         send_batch_size: 1000
@@ -60,37 +136,72 @@ data:
           address: 0.0.0.0:8888
       pipelines:
         metrics:
-          receivers: [otlp, prometheus]
-          processors: [batch]
+          receivers: [otlp, prometheus, hostmetrics, kubeletstats]
+          processors: [memory_limiter, k8sattributes, batch]
           exporters: [prometheusremotewrite]
         logs:
-          receivers: [otlp]
-          processors: [batch]
+          receivers: [otlp, filelog]
+          processors: [memory_limiter, k8sattributes, batch]
           exporters: [otlphttp/vlogs]
         traces:
           receivers: [otlp]
-          processors: [batch]
+          processors: [memory_limiter, k8sattributes, batch]
           exporters: [otlphttp/vtraces]
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: otel-collector
+  namespace: observability
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-collector
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "nodes/proxy", "pods", "namespaces"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otel-collector
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: otel-collector
+subjects:
+  - kind: ServiceAccount
+    name: otel-collector
+    namespace: observability
+---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: otel-collector
   namespace: observability
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: otel-collector
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: otel-collector
     spec:
+      serviceAccountName: otel-collector
       containers:
         - name: otel-collector
           image: {{ .Values.otelCollector.image }}
           args: ["--config=/etc/otel/config.yaml"]
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           ports:
             - name: otlp-grpc
               containerPort: 4317
@@ -102,10 +213,17 @@ spec:
             - name: config
               mountPath: /etc/otel/config.yaml
               subPath: config.yaml
+            - name: varlogpods
+              mountPath: /var/log/pods
+              readOnly: true
       volumes:
         - name: config
           configMap:
             name: otel-collector-config
+        - name: varlogpods
+          hostPath:
+            path: /var/log/pods
+            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service

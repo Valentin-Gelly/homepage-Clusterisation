@@ -43,6 +43,18 @@ spec:
                   fieldPath: status.podIP
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: "localhost:5000,$(MY_POD_IP):4000,$(MY_POD_IP):3000" # See gethomepage.dev/installation/#homepage_allowed_hosts . Value before the comma is required for the k8s probe
+            - name: OTEL_SERVICE_NAME
+              value: homepage
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector.observability.svc.cluster.local:4318
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: http/protobuf
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            - name: OTEL_LOGS_EXPORTER
+              value: otlp
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: deployment.environment=dev,k8s.namespace.name=default
           ports:
             - name: http
               containerPort: 3000
@@ -85,28 +97,6 @@ spec:
               name: logs
             - mountPath: /app/public/images
               name: images
-        - name: log-shipper
-          image: fluent/fluent-bit:latest
-          securityContext:
-            runAsUser: 0
-          args:
-            - /fluent-bit/bin/fluent-bit
-            - -i
-            - tail
-            - -p
-            - path=/var/log/pods/default_homepage-*/*/*.log
-            - -o
-            - opentelemetry
-            - -p
-            - host=otel-collector.observability.svc.cluster.local
-            - -p
-            - port=4318
-            - -p
-            - logs_uri=/v1/logs
-          volumeMounts:
-            - name: varlogpods
-              mountPath: /var/log/pods
-              readOnly: true
       volumes:
       - configMap:
           name: homepage-docker
@@ -137,6 +127,3 @@ spec:
       - persistentVolumeClaim:
           claimName: homepage-images-pvc
         name: images
-      - name: varlogpods
-        hostPath:
-          path: /var/log/pods

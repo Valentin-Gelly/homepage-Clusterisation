@@ -7,6 +7,9 @@ grafana:
 otelCollector:
   image: otel/opentelemetry-collector-contrib:0.114.0
 
+kubeStateMetrics:
+  image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0
+
 victoria:
   metrics:
     image: victoriametrics/victoria-metrics:v1.111.0
