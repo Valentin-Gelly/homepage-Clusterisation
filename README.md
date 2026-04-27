@@ -131,3 +131,44 @@ kubectl delete namespace homepage observability garage
 ```bash
 helm list -A
 ```
+
+### Nettoyer (purger) les donnees persistees
+
+1. Supprimer la stack d'observabilite:
+```bash
+helm uninstall observability -n observability
+```
+
+2. Supprimer les PVC pour effacer les donnees:
+```bash
+kubectl delete pvc -n observability \
+  grafana-data \
+  victoria-metrics-data \
+  victoria-logs-data \
+  victoria-traces-data
+```
+
+3. Reinstaller la stack:
+```bash
+helm install observability ./observability-stack --namespace observability --create-namespace
+```
+
+Option "soft clean" (sans supprimer les volumes): si tu fais juste `helm upgrade` ou un redeploy, les donnees restent.
+
+
+```shell
+helm upgrade observability ./observability-stack --namespace observability --create-namespace
+```
+
+### Persistance des donnees observability
+
+- Grafana conserve deja sa configuration/dashboards via son PVC.
+- Les donnees sont maintenant persistees aussi pour:
+  - victoria-metrics
+  - victoria-logs
+  - victoria-traces
+- Les tailles de volumes se configurent dans `observability-stack/values.yaml`:
+  - `victoria.metrics.persistence.size`
+  - `victoria.logs.persistence.size`
+  - `victoria.traces.persistence.size`
+- Si besoin, on peut définir une storage class pour chaque composant via `storageClass`.

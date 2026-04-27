@@ -1,0 +1,50 @@
+{{- if .Values.victoria.metrics.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: victoria-metrics-data
+  namespace: observability
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.victoria.metrics.persistence.size | quote }}
+  {{- if hasKey .Values.victoria.metrics.persistence "storageClass" }}
+  storageClassName: {{ .Values.victoria.metrics.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}
+---
+{{- if .Values.victoria.logs.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: victoria-logs-data
+  namespace: observability
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.victoria.logs.persistence.size | quote }}
+  {{- if hasKey .Values.victoria.logs.persistence "storageClass" }}
+  storageClassName: {{ .Values.victoria.logs.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}
+---
+{{- if .Values.victoria.traces.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: victoria-traces-data
+  namespace: observability
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.victoria.traces.persistence.size | quote }}
+  {{- if hasKey .Values.victoria.traces.persistence "storageClass" }}
+  storageClassName: {{ .Values.victoria.traces.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}

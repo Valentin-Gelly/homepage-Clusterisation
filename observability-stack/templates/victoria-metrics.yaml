@@ -35,6 +35,17 @@ spec:
               port: 8428
             initialDelaySeconds: 15
             periodSeconds: 30
+          volumeMounts:
+            - name: victoria-metrics-data
+              mountPath: /vm-data
+      volumes:
+        - name: victoria-metrics-data
+          {{- if .Values.victoria.metrics.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: victoria-metrics-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service
