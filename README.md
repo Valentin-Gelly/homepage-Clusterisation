@@ -1,7 +1,7 @@
 Pour lancer l'application kubernetes :
 
 ```bash
-docker build -t homepage:otel .
+docker build --no-cache -t homepage:otel .
 ```
 
 ```bash
@@ -100,8 +100,9 @@ kubectl delete --all deployments --namespace=observability
 ```bash
 helm uninstall homepage -n homepage
 helm uninstall observability -n observability
+helm uninstall garage -n garage
 
-kubectl delete namespace homepage observability
+kubectl delete namespace homepage observability garage
 ```
 
 ```bash
