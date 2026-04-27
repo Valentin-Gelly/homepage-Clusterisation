@@ -1,0 +1,13 @@
+# Valeurs minimales pour un cluster Garage local (k3d/k3s)
+# Adapte storageClass selon ton cluster.
+garage:
+  replicationFactor: 1
+
+deployment:
+  replicaCount: 1
+
+persistence:
+  meta:
+    size: 400Mi
+  data:
+    size: 1Gi

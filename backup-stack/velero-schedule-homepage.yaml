@@ -1,0 +1,14 @@
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: homepage-daily
+  namespace: velero
+spec:
+  # Tous les jours a 02:00
+  schedule: "0 2 * * *"
+  template:
+    ttl: 168h0m0s # retention de 7 jours
+    includedNamespaces:
+      - homepage
+    snapshotVolumes: false
+    defaultVolumesToFsBackup: true

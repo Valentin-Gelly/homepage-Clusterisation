@@ -1,0 +1,40 @@
+# Configuration Velero pour utiliser Garage en backend S3.
+# IMPORTANT:
+# - Mettre a jour `bucket`, `s3Url` et les credentials avant installation.
+# - Le `s3Url` doit pointer vers le vrai service S3 Garage dans le namespace `garage`.
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: homepage-backups
+      default: true
+      config:
+        region: garage
+        s3ForcePathStyle: "true"
+        s3Url: http://garage.garage.svc.cluster.local:3900
+
+credentials:
+  useSecret: true
+  name: cloud-credentials
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=GK53a4f945e3820addfb36e310
+      aws_secret_access_key=4ff7b6e9b3edf42479352ba21698ba534d1bf6e622b2a8bb324fc4ca997a2ce8
+
+# Necessaire pour les backends S3 compatibles (Garage, MinIO, etc.).
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.10.1
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+# En local, les snapshots CSI/cloud sont rarement disponibles:
+# on sauvegarde les volumes via file-system backup.
+snapshotsEnabled: false
+deployNodeAgent: true
+
+# Inclut automatiquement les PV/PVC dans les backups.
+defaultVolumesToFsBackup: true
