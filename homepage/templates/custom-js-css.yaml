@@ -1,9 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: homepage-proxmox
-  namespace: default
+  name: homepage-js-css
+  namespace: homepage
   labels:
     app.kubernetes.io/name: homepage
 data:
-  proxmox.yaml: ""
+  custom.css: ""
+  custom.js: ""

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: homepage-widgets
-  namespace: default
+  namespace: homepage
   labels:
     app.kubernetes.io/name: homepage
 data:

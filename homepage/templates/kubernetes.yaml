@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: homepage-js-css
-  namespace: default
+  name: homepage-kubernetes
+  namespace: homepage
   labels:
     app.kubernetes.io/name: homepage
 data:
-  custom.css: ""
-  custom.js: ""
+  kubernetes.yaml: |
+    mode: cluster

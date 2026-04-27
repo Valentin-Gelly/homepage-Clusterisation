@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: homepage
-  namespace: default
+  namespace: homepage
   labels:
     app.kubernetes.io/name: homepage
 spec:
@@ -54,7 +54,7 @@ spec:
             - name: OTEL_LOGS_EXPORTER
               value: otlp
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: deployment.environment=dev,k8s.namespace.name=default
+              value: deployment.environment=dev,k8s.namespace.name=homepage
           ports:
             - name: http
               containerPort: 3000

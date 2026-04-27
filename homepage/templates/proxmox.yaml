@@ -1,10 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: homepage-kubernetes
-  namespace: default
+  name: homepage-proxmox
+  namespace: homepage
   labels:
     app.kubernetes.io/name: homepage
 data:
-  kubernetes.yaml: |
-    mode: cluster
+  proxmox.yaml: ""
