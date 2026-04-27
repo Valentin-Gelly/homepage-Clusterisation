@@ -69,6 +69,8 @@ data:
             icon: grafana.png
             widget:
               type: grafana
+              alerts: grafana
+              version: 2
               url: http://grafana.observability.svc.cluster.local:4000
               username: admin
               password: admin

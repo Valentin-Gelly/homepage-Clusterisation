@@ -102,6 +102,12 @@ data:
         check_interval: 1s
         limit_mib: 512
         spike_limit_mib: 128
+      transform/logs_message:
+        error_mode: ignore
+        log_statements:
+          - context: log
+            statements:
+              - set(attributes["_msg"], body)
       k8sattributes:
         auth_type: serviceAccount
         extract:
@@ -141,7 +147,7 @@ data:
           exporters: [prometheusremotewrite]
         logs:
           receivers: [otlp, filelog]
-          processors: [memory_limiter, k8sattributes, batch]
+          processors: [memory_limiter, transform/logs_message, k8sattributes, batch]
           exporters: [otlphttp/vlogs]
         traces:
           receivers: [otlp]
