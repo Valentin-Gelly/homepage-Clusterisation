@@ -21,17 +21,12 @@ data:
         access: proxy
         url: http://victoria-logs.observability.svc.cluster.local:9428
 
-      - name: VictoriaTraces
-        type: tempo
+      - name: Jaeger
+        type: jaeger
         access: proxy
-        url: http://victoria-traces.observability.svc.cluster.local:8429/select/tempo
+        url: http://jaeger-query.observability.svc.cluster.local:16686
         jsonData:
-          httpMethod: GET
-          search:
-            hide: false
           nodeGraph:
-            enabled: false
-          serviceMap:
-            datasourceUid: ''
+            enabled: true
           lokiSearch:
             datasourceUid: ''

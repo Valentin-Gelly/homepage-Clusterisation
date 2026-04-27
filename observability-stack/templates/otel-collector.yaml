@@ -45,12 +45,13 @@ data:
           insecure: true
 
       otlphttp/vlogs:
-        endpoint: "http://victoria-logs:9428/insert/opentelemetry"  # ← corrigé
+        endpoint: "http://victoria-logs:9428/insert/opentelemetry"
         tls:
           insecure: true
 
-      otlphttp/vtraces:
-        endpoint: "http://victoria-traces:8429/insert/opentelemetry"  # ← path HTTP
+      # Victoria Traces reçoit nativement en gRPC OTLP sur le port 4317
+      otlpgrpc/vtraces:
+        endpoint: "victoria-traces:4317"
         tls:
           insecure: true
 
@@ -70,7 +71,7 @@ data:
         traces:
           receivers: [otlp]
           processors: [batch]
-          exporters: [otlphttp/vtraces]
+          exporters: [otlpgrpc/vtraces]
 ---
 apiVersion: apps/v1
 kind: Deployment
