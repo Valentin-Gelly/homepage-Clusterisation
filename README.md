@@ -1,6 +1,20 @@
 Pour lancer l'application kubernetes :
 
 ```bash
+docker build -t homepage:otel .
+```
+
+```bash
+k3d cluster list
+k3d image import homepage:otel -c <nom-du-cluster>
+```
+
+si pas de cluster, en créer un :
+```bash
+k3d cluster create <nom-du-cluster>
+```
+
+```bash
 helm install homepage ./homepage --namespace homepage --create-namespace
 ```
 
@@ -64,7 +78,7 @@ kubectl describe pod -n default -l app.kubernetes.io/name=homepage
 
 2. Dans Grafana > datasource **VictoriaLogs**, tester:
 ```text
-{k8s_namespace_name="default",k8s_pod_name=~"homepage-.*"}
+{k8s.namespace.name="homepage",k8s.pod.name=~"homepage-.*"}
 ```
 
 ### Commandes utiles :
@@ -81,4 +95,15 @@ kubectl delete --all deployments --namespace=homepage
 
 ```bash
 kubectl delete --all deployments --namespace=observability
+```
+
+```bash
+helm uninstall homepage -n homepage
+helm uninstall observability -n observability
+
+kubectl delete namespace homepage observability
+```
+
+```bash
+helm list -A
 ```
