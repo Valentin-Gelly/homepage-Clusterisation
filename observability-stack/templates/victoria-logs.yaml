@@ -22,6 +22,17 @@ spec:
           ports:
             - name: http
               containerPort: 9428
+          volumeMounts:
+            - name: victoria-logs-data
+              mountPath: /vlogs
+      volumes:
+        - name: victoria-logs-data
+          {{- if .Values.victoria.logs.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: victoria-logs-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service

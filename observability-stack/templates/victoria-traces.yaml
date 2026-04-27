@@ -32,6 +32,17 @@ spec:
               port: 8429
             initialDelaySeconds: 5
             periodSeconds: 10
+          volumeMounts:
+            - name: victoria-traces-data
+              mountPath: /vtraces
+      volumes:
+        - name: victoria-traces-data
+          {{- if .Values.victoria.traces.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: victoria-traces-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service

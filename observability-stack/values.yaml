@@ -3,6 +3,10 @@ namespace: observability
 grafana:
   image: grafana/grafana:11.4.0
   adminPassword: admin
+  persistence:
+    enabled: true
+    size: 500M
+    # storageClass: "standard"
 
 otelCollector:
   image: otel/opentelemetry-collector-contrib:0.114.0
@@ -14,8 +18,20 @@ victoria:
   metrics:
     image: victoriametrics/victoria-metrics:v1.111.0
     url: http://victoria-metrics:8428
+    persistence:
+      enabled: true
+      size: 200M
+      # storageClass: "standard"
   logs:
     image: victoriametrics/victoria-logs:v1.23.0-victorialogs
     url: http://victoria-logs:9428
+    persistence:
+      enabled: true
+      size: 200M
+      # storageClass: "standard"
   traces:
     image: victoriametrics/victoria-traces:latest
+    persistence:
+      enabled: true
+      size: 200M
+      # storageClass: "standard"
