@@ -13,10 +13,6 @@ cd homepage-local-project/
 
 # Build de l'image depuis le code source (inclut l'instrumentation OTel)
 docker build -t homepage:local .
-
-# Import direct dans le cluster k3d — aucun registry externe requis
-./k3d-up.sh
-k3d image import homepage:local -c homepage
 ```
 
 > **Note :** `imagePullPolicy: Never` est configuré dans le Deployment, Kubernetes utilisera donc l'image importée sans essayer de la télécharger.
@@ -110,17 +106,3 @@ kubectl delete --namespace=observability service grafana
 # Tout supprimer (observabilité)
 kubectl delete --all deployments --namespace=observability
 ```
-
----
-
-## 🛠️ Développement local avec Tilt (hot-reload)
-
-k3d + Tilt permettent un workflow de développement itératif avec live update, sans registry externe :
-
-```bash
-cd homepage-local-project/k3d
-./k3d-up.sh   # Crée le cluster k3d avec registry local intégré
-tilt up        # Build automatique + déploiement + hot-reload
-```
-
-> Le Tiltfile utilise `Dockerfile-tilt` (mode dev, `next dev`) et un registry local k3d sur `k3d-registry.localhost:55000`.
