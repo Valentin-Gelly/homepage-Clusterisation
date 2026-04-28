@@ -67,11 +67,11 @@ spec:
             periodSeconds: 15
           resources:
             requests:
-              cpu: 10m
-              memory: 32Mi
-            limits:
+              memory: 128Mi
               cpu: 100m
-              memory: 64Mi
+            limits:
+              memory: 512Mi
+              cpu: 500m
           volumeMounts:
             - mountPath: /app/config/proxmox.yaml
               name: homepage-config-proxmox

@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: homepage
-  namespace: default
+  namespace: homepage
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -16,10 +16,10 @@ spec:
         name: cpu
         target:
           type: AverageValue
-          averageValue: 70m
+          averageValue: 150m
     - type: Resource
       resource:
         name: memory
         target:
           type: AverageValue
-          averageValue: 100Mi
+          averageValue: 300Mi
