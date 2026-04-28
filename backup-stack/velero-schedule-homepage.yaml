@@ -10,5 +10,6 @@ spec:
     ttl: 168h0m0s # retention de 7 jours
     includedNamespaces:
       - homepage
+      - observability
     snapshotVolumes: false
     defaultVolumesToFsBackup: true

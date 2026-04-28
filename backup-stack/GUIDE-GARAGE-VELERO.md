@@ -159,7 +159,11 @@ kubectl describe schedule homepage-daily -n velero
 
 ```bash
 velero backup create homepage-manual-$(date +%F-%H%M) \
-  --include-namespaces homepage \
+--include-namespaces homepage \
+--default-volumes-to-fs-backup
+
+velero backup create observability-manual-$(date +%F-%H%M) \
+  --include-namespaces observability \
   --default-volumes-to-fs-backup
 ```
 
