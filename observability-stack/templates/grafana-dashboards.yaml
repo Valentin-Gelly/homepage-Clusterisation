@@ -24,3 +24,5 @@ metadata:
 data:
   homepage-logs.json: |
     {{ .Files.Get "dashboards/homepage-logs.json" | nindent 4 }}
+  homepage-metrics.json: |
+    {{ .Files.Get "dashboards/homepage-metrics.json" | nindent 4 }}

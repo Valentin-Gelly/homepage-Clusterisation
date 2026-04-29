@@ -17,7 +17,7 @@ data:
         target: _blank
 
     - openmeteo:
-        label: FRONCE
+        label: Lyon
         latitude: 45.75616795876988
         longitude: 4.847809439426622
         timezone: Europe/Paris # optional

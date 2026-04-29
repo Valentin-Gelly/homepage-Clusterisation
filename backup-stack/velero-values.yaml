@@ -19,8 +19,8 @@ credentials:
   secretContents:
     cloud: |
       [default]
-      aws_access_key_id=GK53a4f945e3820addfb36e310
-      aws_secret_access_key=4ff7b6e9b3edf42479352ba21698ba534d1bf6e622b2a8bb324fc4ca997a2ce8
+      aws_access_key_id=GKcf896192b552270b6fd4cb4a
+      aws_secret_access_key=71043637871bdd1cf703642e374162826781d3019d3aff01371e6ebd2e283213
 
 # Necessaire pour les backends S3 compatibles (Garage, MinIO, etc.).
 initContainers:
