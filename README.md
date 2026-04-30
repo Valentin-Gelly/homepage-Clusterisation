@@ -1,5 +1,7 @@
 # Homepage-Clusterisation : Clusterisation d'une application homepage.dev avec OpenTelemetry, VictoriaLogs, VictoriaMetrics, VictoriaTraces et Grafana
 
+diaporama de soutenant "présentation BERTHILLOT BOURGUIGNEAU FARINEAU GELLY"
+
 ## Installation (premier lancement)
 
 ### Étape 1 : build de l'application
