@@ -46,7 +46,7 @@
     "next-i18next": "^15.4.3",
     "ping": "^0.4.4",
     "pretty-bytes": "^7.1.0",
-    "raw-body": "^3.0.2",
+    "raw-body": "^4.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-i18next": "^15.5.3",
